@@ -25,11 +25,31 @@ const SUCESS = 200;
 const CREATED = 201;
 const NOT_FOUND = 404;
 
+// MÉTODOS GET (PESQUISA)
+
 // criação do endpoint do tipo get, com a rota /, com status ok
 app.get('/', (req, res) => res.status(SUCESS).json({ message: 'Olá Mundo!' }));
 
 // criação do endpoint do tipo get, com a rota /teams, com status ok
 app.get('/teams', (req, res) => res.status(SUCESS).json({ teams }));
+
+// criei esse get para fazer pesquisas de times por id
+app.get('/teams/:id', (req, res) => {
+  // id vem por parametro e o name e initials vem como info pelo corpo
+  const { id } = req.params;
+
+  // função que localiza se o id existe no objeto atribuida a constante updateTeam
+  const showteam = teams.find((team) => team.id === Number(id));
+
+  if (!showteam) {
+    res.status(NOT_FOUND).json({ message: 'Team not found' });
+  }
+
+  res.status(SUCESS).json({ showteam });
+});
+
+// MÉTODO POST (ADICIONA)
+
 // utilizaçao do endpoint do tipo post(adiciona info), com a rota /teams, com status created
 // IMPORTANTE: é possível usar a mesma rota com tipos diferentes mas nunca iguais
 app.post('/teams', (req, res) => {
@@ -38,6 +58,9 @@ app.post('/teams', (req, res) => {
 
   res.status(CREATED).json({ team: newTeam });
 });
+
+// MÉTODO PUT (ATUALIZA)
+
 // utilização do endpoint do tipo put(atualiza info), com a rota /teams/:id, com status 404 caso não ache e 200 caso sucesso
 app.put('/teams/:id', (req, res) => {
   // id vem por parametro e o name e initials vem como info pelo corpo
@@ -54,6 +77,16 @@ app.put('/teams/:id', (req, res) => {
   updateTeam.name = name;
   updateTeam.initials = initials;
   res.status(SUCESS).json({ updateTeam });
+});
+
+// MÉTODO DELETE (DELETA)
+
+app.delete('/teams/:id', (req, res) => {
+  const { id } = req.params;
+  const arrayPosition = teams.findIndex((team) => team.id === Number(id));
+  teams.splice(arrayPosition, 1);
+
+  res.status(SUCESS).end();
 });
 
 module.exports = app;
